@@ -1,0 +1,131 @@
+import keyboard, openpyxl, pyautogui, tkinter, time, sys, os, datetime
+from tkinter import filedialog, messagebox, Tk, ttk
+from openpyxl import Workbook, load_workbook
+from guizero import App, Text, TextBox, PushButton, Window
+
+##### A Soldat and Luxo Program #####
+
+global siteName
+global apNumber
+global apName
+global formatNumber
+global keyPress
+
+siteName = str ('01-')
+apNumber =  int('1')
+apName = str(siteName) + str(apNumber)
+if apNumber >= 100: 
+	formatNumber = format(apNumber, '03') # Modifies apNumber by adding up to 3 zeros in front
+else:
+	formatNumber = format(apNumber, '02') # Modifies apNumber by adding up to 2 zeros in front
+        
+def theGUI(): #all the GUI stuff
+    print('A Soldat (Paul) and Luxo Program (Erik)')
+    print("  > Functionality:")
+    print("          > Press ' ` ' to type AP name")
+    print("          > Press ' 1 ' to navigate down 1 AP")
+    print("          > Press ' 2 ' to navigate up 1 AP")
+    print("          > Press ' 3 ' to open the menu")
+    
+    def apStartingNumber(): # part of GUI that allows changing of the starting AP number
+        global apNumber
+        global formatNumber
+        apNumber = int(startingNumber.value)
+        if apNumber >= 100:
+                formatNumber = format(apNumber, '03') # Modifies apNumber by adding up to 3 zeros in front
+        else:
+                formatNumber = format(apNumber, '02') # Modifies apNumber by adding up to 2 zeros in front
+        print ('AP number changed to: ' + str(apNumber))
+        changingText.value = "AP number changed to: " + str(apNumber) #Text for changing AP number
+
+    def changeSiteName(): # part of GUI that allows changing of the site name
+        global siteName
+        global apName
+        siteName = str(siteNames.value)
+        apName = str(siteName) + str(apNumber)
+        print('Site name changed to: ' + siteName)
+        changingText.value = "Prefix changed to: " + siteName #Text for changing prefix name
+        
+    def directions(): #Once "Start?" has been pressed execute the following items
+        app.hide()
+        visioLoop()
+
+    #Start of the app
+    app = App(title = "Phoenix Oath (Paul)", width=600, height=200, layout='grid')
+    button7 = PushButton(app, text = "Start?", command = directions, grid=[2,3])
+
+    #Logic for changing starting AP number
+    startingNumberText = Text(app, text="AP Number? (Default is 1)", align="left", grid=[0,1]) #Text asks for AP number
+    startingNumber = TextBox(app, align="right",text = "", width=15, grid=[1,1]) #Text box for data entry
+    button4 = PushButton(app, text = "Change", command = apStartingNumber, grid=[2,1])
+
+    #Logic for changing site name
+    siteNamesText = Text(app, text="Prefix? (Default is 01-)", align="left",  grid=[0,2]) #Text asks for site name
+    siteNames = TextBox(app, align="right",text = "", width=15, grid=[1,2]) #Text box for data entry
+    button6 = PushButton(app, text = "Change", command = changeSiteName, grid=[2,2])
+
+    changingText = Text(app,text="To be neutral does not mean to be indifferent", align ="left", grid=[0,3])
+    app.display() # initiates the GUI. Allowing it to be used
+      
+def visioGuts(): # the internals to the Visio Tool. Determines how most of the program is run
+    global apNumber
+    global formatNumber
+    print (f'     {apName}')
+    pyautogui.press('backspace'); pyautogui.typewrite(str(apName)) # takes control of keyboard. hits backspace and types AP number
+    apNumber += 1 #increments ap number up by 1
+    if apNumber >= 100: 
+    	formatNumber = format(apNumber, '03') # Modifies apNumber by adding up to 3 zeros in front
+    else:
+    	formatNumber = format(apNumber, '02') # Modifies apNumber by adding up to 2 zeros in front
+
+def visioLoop():
+    global apNumber
+    global formatNumber
+    global apName
+ 
+    print("Last AP named:")
+
+    while True:
+        keyPress = keyboard.read_key() #reads ALL keypress's and saves to variable
+        
+        if keyPress == '`' : #Adds a Default Ap to cutsheet
+            apName = str(siteName) + str(formatNumber)
+            visioGuts ()
+            time.sleep(.09)
+            
+        elif keyPress == '1': #goes down one ap number.
+            apNumber -= 1
+            if apNumber >= 100: 
+                formatNumber = format(apNumber, '03') # Modifies apNumber by adding up to 3 zeros in front
+            else:
+                formatNumber = format(apNumber, '02') # Modifies apNumber by adding up to 2 zeros in front
+            apName = str(siteName) + str(formatNumber)
+            print (f'Fixing AP: {apName} ?')
+            time.sleep(.11)
+
+        elif keyPress == '2': #goes up one ap number.
+            apNumber += 1
+            if apNumber >= 100: 
+                formatNumber = format(apNumber, '03') # Modifies apNumber by adding up to 3 zeros in front
+            else:
+                formatNumber = format(apNumber, '02') # Modifies apNumber by adding up to 2 zeros in front
+            apName = str(siteName) + str(formatNumber)
+            print (f'Fixing AP: {apName} ?')
+            time.sleep(.11)
+
+        elif keyPress == '3': #opens options
+	        main()
+
+def main():   #the first loop, initates everything
+    print("Starting Visio Naming Tool... \n")           
+    theGUI()
+
+if __name__ == "__main__":
+    main()   #this is the call to run the whole program
+
+# ******************************
+# Changes *********************
+# ******************************
+    # First release!
+    # Maybe add ability to show AP that is going to be typed.
+
